@@ -46,44 +46,34 @@ Small field-service businesses lose money to double-booked technicians, missed f
 
 ## 📁 Project Structure
 
-.
-├── backend/
-│ └── src/
-│ ├── features/ # One folder per domain capability
-│ │ ├── auth/ # Login, session, JWT issuance
-│ │ ├── customers/ # Customers + nested properties
-│ │ ├── technicians/ # Technician profiles & working hours
-│ │ ├── service-catalog/ # Service types, pricing, duration
-│ │ ├── jobs/ # Lifecycle, assignment, saved views, history
-│ │ └── dashboard/ # Aggregated operations metrics
-│ ├── shared/
-│ │ ├── config/ # Environment loading, MongoDB connection
-│ │ ├── errors/ # Centralized AppError class
-│ │ └── middleware/ # Auth guard, role guard, rate limiting, error handler
-│ ├── scripts/seed.js # Deterministic database seeding
-│ ├── app.js # Express app + route registration
-│ └── index.js # Server entry point
-│
-├── frontend/
-│ └── src/
-│ ├── features/ # Mirrors backend feature folders
-│ │ ├── auth/
-│ │ ├── customers/
-│ │ ├── technicians/
-│ │ ├── service-catalog/
-│ │ ├── jobs/
-│ │ └── dashboard/
-│ ├── shared/
-│ │ ├── api/client.js # Fetch wrapper, token storage
-│ │ └── components/
-│ ├── App.jsx
-│ └── styles.css
-│
-├── .vscode/launch.json # Debugger configuration
-├── hackerrank.yml # Install/run commands, protected paths
-├── setup.sh # Environment + MongoDB + seed bootstrap
-└── README.md
+**Backend** (`backend/src/`)
+- **`features/`** — one folder per domain capability
+  - `auth/` — login, session, JWT issuance
+  - `customers/` — customers + nested properties
+  - `technicians/` — technician profiles & working hours
+  - `service-catalog/` — service types, pricing, duration
+  - `jobs/` — lifecycle, assignment, saved views, history
+  - `dashboard/` — aggregated operations metrics
+- **`shared/`**
+  - `config/` — environment loading, MongoDB connection
+  - `errors/` — centralized `AppError` class
+  - `middleware/` — auth guard, role guard, rate limiting, error handler
+- `scripts/seed.js` — deterministic database seeding
+- `app.js` — Express app + route registration
+- `index.js` — server entry point
 
+**Frontend** (`frontend/src/`)
+- **`features/`** — mirrors backend feature folders (`auth/`, `customers/`, `technicians/`, `service-catalog/`, `jobs/`, `dashboard/`)
+- **`shared/`**
+  - `api/client.js` — fetch wrapper, token storage
+  - `components/`
+- `App.jsx`, `styles.css`
+
+**Root**
+- `.vscode/launch.json` — debugger configuration
+- `hackerrank.yml` — install/run commands, protected paths
+- `setup.sh` — environment + MongoDB + seed bootstrap
+- `README.md`
 
 > Every backend feature follows the same request flow: **route → controller → service → repository → MongoDB** — keeping HTTP handling, business rules, and persistence cleanly separated.
 
