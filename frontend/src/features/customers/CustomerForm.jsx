@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEscapeKey } from "../../shared/hooks/useEscapeKey.js";
 
 export function CustomerForm({ customer, onCancel, onSave }) {
 	const [name, setName] = useState(customer?.name || "");
@@ -7,6 +8,8 @@ export function CustomerForm({ customer, onCancel, onSave }) {
 	const [notes, setNotes] = useState(customer?.notes || "");
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
+
+	useEscapeKey(onCancel);
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();

@@ -88,31 +88,33 @@ export function CustomerList({ canManage }) {
 					<p>{customers.length === 0 ? "Add your first customer to get started." : "Try a different search term."}</p>
 				</div>
 			) : (
-				<table className="customers-table">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Phone</th>
-							<th>Email</th>
-							{canManage && <th aria-label="Actions" />}
-						</tr>
-					</thead>
-					<tbody>
-						{filtered.map((customer) => (
-							<tr className={selectedId === customer._id ? "selected" : ""} key={customer._id}>
-								<td><button className="row-link" onClick={() => setSelectedId(customer._id)} type="button">{customer.name}</button></td>
-								<td>{customer.phone}</td>
-								<td>{customer.email || "—"}</td>
-								{canManage && (
-									<td className="row-actions">
-										<button onClick={() => openEdit(customer)} type="button">Edit</button>
-										<button className="danger-link" onClick={() => removeCustomer(customer)} type="button">Delete</button>
-									</td>
-								)}
+				<div className="customers-table-wrap">
+					<table className="customers-table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Phone</th>
+								<th>Email</th>
+								{canManage && <th aria-label="Actions" />}
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{filtered.map((customer) => (
+								<tr className={selectedId === customer._id ? "selected" : ""} key={customer._id}>
+									<td><button className="row-link" onClick={() => setSelectedId(customer._id)} type="button">{customer.name}</button></td>
+									<td>{customer.phone}</td>
+									<td>{customer.email || "—"}</td>
+									{canManage && (
+										<td className="row-actions">
+											<button onClick={() => openEdit(customer)} type="button">Edit</button>
+											<button className="danger-link" onClick={() => removeCustomer(customer)} type="button">Delete</button>
+										</td>
+									)}
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 			)}
 			{selectedId && (
 				<div className="customer-detail" role="region" aria-label="Customer detail">

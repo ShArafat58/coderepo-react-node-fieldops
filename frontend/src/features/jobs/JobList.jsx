@@ -4,6 +4,7 @@ import { serviceTypeApi } from "../service-catalog/service-type.api.js";
 import { technicianApi } from "../technicians/technician.api.js";
 import { jobApi } from "./job.api.js";
 import { savedViewApi } from "./saved-view.api.js";
+import { useEscapeKey } from "../../shared/hooks/useEscapeKey.js";
 
 const STATUS_LABELS = { requested: "Requested", scheduled: "Scheduled", en_route: "En route", in_progress: "In progress", completed: "Completed", invoiced: "Invoiced", cancelled: "Cancelled" };
 const NEXT_STATUS = { requested: ["scheduled", "cancelled"], scheduled: ["en_route", "cancelled"], en_route: ["in_progress", "cancelled"], in_progress: ["completed", "cancelled"], completed: ["invoiced"], invoiced: [], cancelled: [] };
@@ -28,6 +29,8 @@ function JobForm({ onCancel, onSave }) {
 	const [scheduledEndAt, setScheduledEndAt] = useState("");
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
+
+	useEscapeKey(onCancel);
 
 	useEffect(() => {
 		customerApi.list().then(setCustomers).catch(() => {});
@@ -131,6 +134,8 @@ function AssignModal({ job, onCancel, onConfirm }) {
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
 
+	useEscapeKey(onCancel);
+
 	useEffect(() => { technicianApi.list().then(setTechnicians).catch(() => {}); }, []);
 
 	const selectedTechnician = technicians.find((technician) => technician._id === technicianId);
@@ -178,6 +183,8 @@ function CompletionModal({ onCancel, onConfirm }) {
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
 
+	useEscapeKey(onCancel);
+
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		try {
@@ -213,6 +220,8 @@ function HistoryModal({ jobId, onCancel }) {
 	const [job, setJob] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
+
+	useEscapeKey(onCancel);
 
 	useEffect(() => {
 		let active = true;
@@ -260,6 +269,8 @@ function HistoryModal({ jobId, onCancel }) {
 function SaveViewModal({ onCancel, onConfirm }) {
 	const [name, setName] = useState("");
 	const [saving, setSaving] = useState(false);
+
+	useEscapeKey(onCancel);
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();

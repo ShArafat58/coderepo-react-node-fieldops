@@ -1020,9 +1020,9 @@ textarea:focus-visible {
 
 .job-card {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
     padding: 16px 18px;
     border: 1px solid var(--divider);
     border-radius: 12px;
@@ -1033,6 +1033,7 @@ textarea:focus-visible {
     display: grid;
     gap: 4px;
     min-width: 0;
+    flex: 1 1 240px;
 }
 
 .job-card-title {
@@ -1066,6 +1067,14 @@ textarea:focus-visible {
     flex-wrap: wrap;
     gap: 8px;
     flex-shrink: 0;
+    width: 100%;
+}
+
+@media (min-width: 700px) {
+    .job-card-actions {
+        width: auto;
+        margin-left: auto;
+    }
 }
 
 .job-card-actions button {
@@ -1499,7 +1508,7 @@ textarea:focus-visible {
     width: 100%;
 }
 
-.status-pie-layout > svg {
+.status-pie-layout>svg {
     position: relative;
 }
 
@@ -1660,4 +1669,178 @@ textarea:focus-visible {
     .dashboard-grid-side {
         grid-template-columns: 1fr;
     }
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.menu-toggle span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    border-radius: 2px;
+    background: var(--ink-strong);
+}
+
+.mobile-nav-scrim {
+    display: none;
+}
+
+.mobile-nav-drawer {
+    display: none;
+}
+
+@media (max-width: 860px) {
+    .dashboard-nav {
+        display: none;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+
+    .dashboard-user-info {
+        display: none;
+    }
+
+    .mobile-nav-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 400;
+        background: rgb(0 0 0 / 50%);
+        border: 0;
+        padding: 0;
+    }
+
+    .mobile-nav-drawer {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 401;
+        width: min(260px, 80vw);
+        padding: 20px 14px;
+        gap: 4px;
+        background: var(--surface);
+        box-shadow: 4px 0 24px rgb(0 0 0 / 40%);
+        overflow-y: auto;
+    }
+
+    .mobile-nav-drawer button {
+        min-height: 44px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--ink-strong);
+        font-size: 15px;
+        text-align: left;
+    }
+
+    .mobile-nav-drawer button.active {
+        background: var(--accent-tint);
+        color: var(--accent-ink);
+    }
+
+    .mobile-nav-divider {
+        height: 1px;
+        margin: 10px 4px;
+        background: var(--divider);
+    }
+
+    .mobile-nav-user {
+        color: var(--danger) !important;
+    }
+}
+
+.customers-view,
+.job-filters,
+.customers-toolbar {
+    max-width: 100%;
+}
+
+.customers-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+
+    .customers-table th:nth-child(3),
+    .customers-table td:nth-child(3) {
+        display: none;
+    }
+
+    .customers-table {
+        font-size: 12px;
+    }
+
+    .customers-table th,
+    .customers-table td {
+        padding: 8px 10px;
+        white-space: nowrap;
+    }
+
+    .property-notes {
+        display: none;
+    }
+
+    .status-pill {
+        white-space: nowrap;
+    }
+
+    .job-filters {
+        flex-wrap: wrap;
+    }
+
+    .job-filters select,
+    .job-filters input[type="date"] {
+        flex: 1 1 140px;
+        min-width: 0;
+    }
+
+    .dashboard-grid-main {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-grid-side {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .status-pie-layout svg {
+        width: 160px;
+        height: 160px;
+    }
+
+    .dashboard-header {
+        padding: 0 12px;
+    }
+}
+
+html,
+body {
+    overflow-x: hidden;
 }

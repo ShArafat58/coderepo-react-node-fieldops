@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { technicianApi } from "./technician.api.js";
+import { useEscapeKey } from "../../shared/hooks/useEscapeKey.js";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -13,6 +14,8 @@ function TechnicianForm({ onCancel, onSave }) {
 	const [endTime, setEndTime] = useState("17:00");
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
+
+	useEscapeKey(onCancel);
 
 	const toggleDay = (day) => setDaysOfWeek((days) => days.includes(day) ? days.filter((item) => item !== day) : [...days, day].sort());
 
@@ -124,34 +127,36 @@ export function TechnicianList({ canManage }) {
 					<p>Add your first technician to start assigning jobs.</p>
 				</div>
 			) : (
-				<table className="customers-table">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Email</th>
-							<th>Skills</th>
-							<th>Working hours</th>
-							<th>Status</th>
-							{canManage && <th aria-label="Actions" />}
-						</tr>
-					</thead>
-					<tbody>
-						{technicians.map((technician) => (
-							<tr className={technician.userId.active ? "" : "inactive-row"} key={technician._id}>
-								<td><strong>{technician.userId.name}</strong></td>
-								<td>{technician.userId.email}</td>
-								<td>{technician.skills.join(", ") || "—"}</td>
-								<td>{technician.workingHours.daysOfWeek.map((day) => DAY_LABELS[day]).join(" ")} · {technician.workingHours.startTime}–{technician.workingHours.endTime}</td>
-								<td><span className={`status-pill ${technician.userId.active ? "active" : "inactive"}`}>{technician.userId.active ? "Active" : "Inactive"}</span></td>
-								{canManage && (
-									<td className="row-actions">
-										<button onClick={() => toggleActive(technician)} type="button">{technician.userId.active ? "Deactivate" : "Activate"}</button>
-									</td>
-								)}
+				<div className="customers-table-wrap">
+					<table className="customers-table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Email</th>
+								<th>Skills</th>
+								<th>Working hours</th>
+								<th>Status</th>
+								{canManage && <th aria-label="Actions" />}
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{technicians.map((technician) => (
+								<tr className={technician.userId.active ? "" : "inactive-row"} key={technician._id}>
+									<td><strong>{technician.userId.name}</strong></td>
+									<td>{technician.userId.email}</td>
+									<td>{technician.skills.join(", ") || "—"}</td>
+									<td>{technician.workingHours.daysOfWeek.map((day) => DAY_LABELS[day]).join(" ")} · {technician.workingHours.startTime}–{technician.workingHours.endTime}</td>
+									<td><span className={`status-pill ${technician.userId.active ? "active" : "inactive"}`}>{technician.userId.active ? "Active" : "Inactive"}</span></td>
+									{canManage && (
+										<td className="row-actions">
+											<button onClick={() => toggleActive(technician)} type="button">{technician.userId.active ? "Deactivate" : "Activate"}</button>
+										</td>
+									)}
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 			)}
 			{formOpen && <TechnicianForm onCancel={() => setFormOpen(false)} onSave={save} />}
 		</div>

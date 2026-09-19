@@ -59,18 +59,31 @@ const NAV_ITEMS = [
 
 function DashboardShell({ user, onLogout }) {
 	const [view, setView] = useState("overview");
+	const [menuOpen, setMenuOpen] = useState(false);
 	const visibleItems = NAV_ITEMS.filter((item) => item.roles.includes(user.role));
+
+	const selectView = (id) => {
+		setView(id);
+		setMenuOpen(false);
+	};
 
 	return (
 		<main className="dashboard-shell">
 			<header className="dashboard-header">
-				<div className="app-boot-brand">
-					<span className="brand-mark">F</span>
-					<strong>FieldOps</strong>
+				<div className="header-left">
+					<button aria-expanded={menuOpen} aria-label="Toggle menu" className="menu-toggle" onClick={() => setMenuOpen((open) => !open)} type="button">
+						<span />
+						<span />
+						<span />
+					</button>
+					<div className="app-boot-brand">
+						<span className="brand-mark">F</span>
+						<strong>FieldOps</strong>
+					</div>
 				</div>
 				<nav className="dashboard-nav">
 					{visibleItems.map((item) => (
-						<button className={view === item.id ? "active" : ""} key={item.id} onClick={() => setView(item.id)} type="button">{item.label}</button>
+						<button className={view === item.id ? "active" : ""} key={item.id} onClick={() => selectView(item.id)} type="button">{item.label}</button>
 					))}
 				</nav>
 				<div className="dashboard-user">
@@ -82,6 +95,18 @@ function DashboardShell({ user, onLogout }) {
 					<button className="sign-out-button" onClick={onLogout} type="button">Sign out</button>
 				</div>
 			</header>
+			{menuOpen && (
+				<>
+					<button aria-label="Close menu" className="mobile-nav-scrim" onClick={() => setMenuOpen(false)} type="button" />
+					<nav className="mobile-nav-drawer">
+						{visibleItems.map((item) => (
+							<button className={view === item.id ? "active" : ""} key={item.id} onClick={() => selectView(item.id)} type="button">{item.label}</button>
+						))}
+						<div className="mobile-nav-divider" />
+						<button className="mobile-nav-user" onClick={onLogout} type="button">Sign out ({user.name})</button>
+					</nav>
+				</>
+			)}
 			<div className="dashboard-body">
 				{view === "overview" && (user.role === "admin" ? <Dashboard /> : <TechnicianOverview user={user} />)}
 				{view === "jobs" && <JobList canCreate={user.role === "admin"} />}

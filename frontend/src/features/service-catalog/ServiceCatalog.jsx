@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { serviceTypeApi } from "./service-type.api.js";
+import { useEscapeKey } from "../../shared/hooks/useEscapeKey.js";
 
 function ServiceTypeForm({ onCancel, onSave, serviceType }) {
 	const [name, setName] = useState(serviceType?.name || "");
@@ -8,6 +9,8 @@ function ServiceTypeForm({ onCancel, onSave, serviceType }) {
 	const [basePrice, setBasePrice] = useState(serviceType?.basePrice ?? 0);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
+
+	useEscapeKey(onCancel);
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
@@ -112,37 +115,39 @@ export function ServiceCatalog({ canManage }) {
 					<p>Add your first service type to build the catalog.</p>
 				</div>
 			) : (
-				<table className="customers-table">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Duration</th>
-							<th>Base price</th>
-							<th>Status</th>
-							{canManage && <th aria-label="Actions" />}
-						</tr>
-					</thead>
-					<tbody>
-						{serviceTypes.map((serviceType) => (
-							<tr className={serviceType.active ? "" : "inactive-row"} key={serviceType._id}>
-								<td>
-									<strong>{serviceType.name}</strong>
-									{serviceType.description && <p className="property-notes">{serviceType.description}</p>}
-								</td>
-								<td>{serviceType.estimatedDurationMinutes} min</td>
-								<td>${serviceType.basePrice.toFixed(2)}</td>
-								<td><span className={`status-pill ${serviceType.active ? "active" : "inactive"}`}>{serviceType.active ? "Active" : "Inactive"}</span></td>
-								{canManage && (
-									<td className="row-actions">
-										<button onClick={() => openEdit(serviceType)} type="button">Edit</button>
-										<button onClick={() => toggleActive(serviceType)} type="button">{serviceType.active ? "Deactivate" : "Activate"}</button>
-										<button className="danger-link" onClick={() => remove(serviceType)} type="button">Delete</button>
-									</td>
-								)}
+				<div className="customers-table-wrap">
+					<table className="customers-table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Duration</th>
+								<th>Base price</th>
+								<th>Status</th>
+								{canManage && <th aria-label="Actions" />}
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{serviceTypes.map((serviceType) => (
+								<tr className={serviceType.active ? "" : "inactive-row"} key={serviceType._id}>
+									<td>
+										<strong>{serviceType.name}</strong>
+										{serviceType.description && <p className="property-notes">{serviceType.description}</p>}
+									</td>
+									<td>{serviceType.estimatedDurationMinutes} min</td>
+									<td>${serviceType.basePrice.toFixed(2)}</td>
+									<td><span className={`status-pill ${serviceType.active ? "active" : "inactive"}`}>{serviceType.active ? "Active" : "Inactive"}</span></td>
+									{canManage && (
+										<td className="row-actions">
+											<button onClick={() => openEdit(serviceType)} type="button">Edit</button>
+											<button onClick={() => toggleActive(serviceType)} type="button">{serviceType.active ? "Deactivate" : "Activate"}</button>
+											<button className="danger-link" onClick={() => remove(serviceType)} type="button">Delete</button>
+										</td>
+									)}
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 			)}
 			{formOpen && <ServiceTypeForm onCancel={closeForm} onSave={save} serviceType={editing} />}
 		</div>
