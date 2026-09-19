@@ -1,35 +1,46 @@
-# FieldOps
+<div align="center">
 
-**A modern field-service dispatch and operations platform** — built to help pest-control, HVAC, and home-service businesses manage customers, coordinate technicians, and keep every job on track from first request to final invoice.
+# 🔧 FieldOps
 
-FieldOps replaces scattered spreadsheets and phone calls with a single, real-time operations hub: dispatchers create and assign jobs with automatic conflict detection, technicians see exactly what's on their plate for the day, and admins get a live dashboard showing revenue, utilization, and job health at a glance.
+### Field Service Dispatch & Operations Management
+
+**Stop juggling spreadsheets and phone calls.** FieldOps gives pest-control, HVAC, and home-service businesses one real-time hub to manage customers, dispatch technicians, and track every job from first call to final invoice.
+
+`React 19` · `Express 5` · `MongoDB` · `Bun`
+
+</div>
 
 ---
 
-## ✨ What FieldOps Does
+## 🎯 What It Solves
 
-| For Admins & Dispatchers | For Technicians |
+Small field-service businesses lose money to double-booked technicians, missed follow-ups, and zero visibility into what's actually happening on the ground. **FieldOps fixes that** with a single source of truth for every customer, property, job, and technician — enforced by real business rules, not just a pretty form.
+
+## ✨ Key Capabilities
+
+| 🔐 **Role-Based Access** | Admins run the business; technicians see only their own work — enforced end to end, not just hidden in the UI. |
 |---|---|
-| Manage customers, properties, and the service catalog | View only their assigned jobs |
-| Assign technicians with automatic scheduling-conflict and working-hours checks | Update job status as work progresses |
-| Track every job through a full lifecycle — requested → scheduled → en route → in progress → completed → invoiced | Log completion notes when finishing a job |
-| Filter and save custom job views | See their own workload without noise |
-| Monitor a live operations dashboard — revenue by service, technician utilization, job status breakdown | |
-| Review a full audit trail for every job | |
+| 👥 **Customers & Properties** | One customer, many properties — full history in one click. |
+| 🧾 **Service Catalog** | Configurable services with pricing and duration that drive every downstream calculation. |
+| 🔁 **Job Lifecycle Engine** | A real state machine — `requested → scheduled → en route → in progress → completed → invoiced` — with illegal transitions blocked server-side. |
+| 🛡️ **Conflict-Proof Scheduling** | Assigning a technician automatically checks for double-booking *and* working-hours violations before it's allowed. |
+| 🔍 **Smart Filtering + Saved Views** | Filter by status, technician, or date — then save it as a one-click view, persisted per user in MongoDB. |
+| 📊 **Live Operations Dashboard** | Revenue by service, technician utilization, and job-status breakdown — rendered as animated custom charts. |
+| 🕒 **Full Audit Trail** | Every status change is logged with who, when, and why — visible right on the job. |
 
 ---
 
 ## 🛠 Technology Stack
 
-| Layer | Technology |
+| Layer | Choice |
 |---|---|
-| Frontend | React 19 (Vite) |
-| Backend | Node.js + Express 5 |
-| Database | MongoDB (Mongoose ODM) |
-| Package manager | Bun (single workspace, `bun.lock`) |
-| Validation | Zod (schema validation on every write endpoint) |
-| Authentication | JWT (JSON Web Tokens), bcrypt password hashing |
-| Styling | Hand-rolled CSS with design tokens (no component library) |
+| **Frontend** | React 19 + Vite |
+| **Backend** | Node.js + Express 5 |
+| **Database** | MongoDB (Mongoose ODM) |
+| **Package Manager** | Bun — single workspace, single `bun.lock` |
+| **Validation** | Zod on every write endpoint |
+| **Auth** | JWT + bcrypt password hashing |
+| **Styling** | Hand-crafted CSS with a design-token system — no UI framework |
 
 ---
 
@@ -43,7 +54,7 @@ FieldOps replaces scattered spreadsheets and phone calls with a single, real-tim
 │ │ ├── customers/ # Customers + nested properties
 │ │ ├── technicians/ # Technician profiles & working hours
 │ │ ├── service-catalog/ # Service types, pricing, duration
-│ │ ├── jobs/ # Job lifecycle, assignment, saved views, history
+│ │ ├── jobs/ # Lifecycle, assignment, saved views, history
 │ │ └── dashboard/ # Aggregated operations metrics
 │ ├── shared/
 │ │ ├── config/ # Environment loading, MongoDB connection
@@ -52,6 +63,7 @@ FieldOps replaces scattered spreadsheets and phone calls with a single, real-tim
 │ ├── scripts/seed.js # Deterministic database seeding
 │ ├── app.js # Express app + route registration
 │ └── index.js # Server entry point
+│
 ├── frontend/
 │ └── src/
 │ ├── features/ # Mirrors backend feature folders
@@ -66,83 +78,84 @@ FieldOps replaces scattered spreadsheets and phone calls with a single, real-tim
 │ │ └── components/
 │ ├── App.jsx
 │ └── styles.css
+│
 ├── .vscode/launch.json # Debugger configuration
 ├── hackerrank.yml # Install/run commands, protected paths
 ├── setup.sh # Environment + MongoDB + seed bootstrap
 └── README.md
 
 
-Each backend feature follows the same request flow: **route → controller → service → repository → MongoDB**, keeping HTTP handling, business rules, and persistence cleanly separated.
+> Every backend feature follows the same request flow: **route → controller → service → repository → MongoDB** — keeping HTTP handling, business rules, and persistence cleanly separated.
 
 ---
 
 ## ✅ Prerequisites
 
-- **Bun** ≥ 1.4 ([install guide](https://bun.sh))
-- **MongoDB** running locally on `127.0.0.1:27017` (Community Server or equivalent)
-- **Git Bash** (Windows) or any POSIX-compatible shell — `setup.sh` relies on Bash's `/dev/tcp` for MongoDB connectivity checks
+- **Bun** ≥ 1.4 — [install guide](https://bun.sh)
+- **MongoDB** running locally on `127.0.0.1:27017`
+- **Git Bash** (Windows) or any POSIX shell — `setup.sh` uses Bash's `/dev/tcp` for MongoDB checks
 
 ---
 
 ## 🗄 MongoDB Behavior
 
-- On every `install` and `start`, `setup.sh` verifies MongoDB is reachable on port `27017` (starting a local instance if one isn't already running).
-- Seeding **clears all application collections** and repopulates them with a consistent, realistic baseline — running the seed script twice in a row produces identical data.
-- Restarting the full application (`bun start`) re-runs the seed step, so the database always returns to its documented baseline state.
-- The health endpoint (`GET /api/v1/health`) reports `"connected"` or `"degraded"` based on live MongoDB connection state, distinguishing a running API from a working database.
+- Every `install` and `start` verifies MongoDB is reachable on port `27017` before proceeding.
+- Seeding **wipes all application collections** and rebuilds a consistent baseline — running it twice produces identical data.
+- Every `bun start` re-runs the seed step, so the database always returns to its documented state.
+- `GET /api/v1/health` reports live MongoDB connection status — distinguishing "API is up" from "database is actually connected."
 
 ---
 
-## 🚀 Run Instructions
+## 🚀 Getting Started
 
-### Clean install (from a fresh checkout)
-
+**1. Clean install**
 ```bash
 bun install && bash setup.sh --seed
 ```
+Installs every workspace dependency, creates `.env` files from `.env.example` if missing, verifies MongoDB, and seeds the database.
 
-This installs all workspace dependencies, creates `.env` files from `.env.example` if missing, verifies MongoDB, and seeds the database.
-
-### Start the full application
-
+**2. Run the app**
 ```bash
 bun start
 ```
+Launches the backend on **port 8000** and frontend on **port 3000**, concurrently — re-running setup/seed first.
 
-This launches the backend on **port 8000** and the frontend on **port 3000** concurrently, re-running the setup/seed step first.
+> ⚠️ **Windows users:** run both commands from **Git Bash**, not PowerShell. The setup script's MongoDB check relies on a Bash-native feature that PowerShell's process model doesn't support correctly.
 
-> **Note:** On Windows, run both commands from **Git Bash**, not PowerShell — the setup script uses a Bash-native MongoDB connectivity check that doesn't behave correctly under PowerShell's process spawning.
-
-Once running, open **http://localhost:3000** in your browser.
+Then open **http://localhost:3000** 🎉
 
 ---
 
 ## 📜 Command Reference
 
-| Command | Purpose |
+| Command | What it does |
 |---|---|
-| `bun install` | Install all workspace dependencies (backend + frontend) |
+| `bun install` | Install all workspace dependencies |
 | `bash setup.sh --seed` | Create env files, verify MongoDB, seed the database |
-| `bun start` | Run the full application (backend + frontend, with setup/seed) |
-| `bun run dev:backend` | Run only the backend, with file-watch auto-reload |
-| `bun run dev:frontend` | Run only the frontend (Vite dev server) |
-| `bun run seed` | Re-seed the database to its baseline state (run from `backend/`) |
+| `bun start` | Run the full app (backend + frontend, with setup/seed) |
+| `bun run dev:backend` | Backend only, with auto-reload on file changes |
+| `bun run dev:frontend` | Frontend only (Vite dev server) |
+| `bun run seed` | Re-seed to baseline (run from `backend/`) |
 
 ---
 
 ## 🔑 Seeded Access
 
-All seeded accounts share the password **`password123`**.
+Every account below uses the password **`password123`**.
 
-| Role | Email | What they can do |
+| Role | Email | Access |
 |---|---|---|
-| Admin | `admin@fieldops.com` | Full access — manage customers, technicians, services, jobs, and view the operations dashboard |
-| Technician | `jordan.smith@fieldops.com` | View and update only their own assigned jobs |
-| Technician | `taylor.johnson@fieldops.com` | Same as above |
-| Technician | `riley.parker@fieldops.com` | Same as above |
+| 🛡️ **Admin** | `admin@fieldops.com` | Full control — customers, technicians, services, jobs, dashboard |
+| 🔧 **Technician** | `jordan.smith@fieldops.com` | Own assigned jobs only |
+| 🔧 **Technician** | `taylor.johnson@fieldops.com` | Own assigned jobs only |
+| 🔧 **Technician** | `riley.parker@fieldops.com` | Own assigned jobs only |
 
-Sign in at `http://localhost:3000` with any of the credentials above. The interface adapts automatically based on role — admins see the full operations suite; technicians see a focused, read-only view of customers and services alongside their own job list.
+The interface adapts automatically to role — admins get the full operations suite, technicians get a focused view of their own work.
 
 ---
 
-*Built for the HackerRank "Build Your Own Full-Stack Application" assignment, mirroring the structure and conventions of the reference `coderepo-react-node-calendar` repository.*
+<div align="center">
+
+*Built for the HackerRank "Build Your Own Full-Stack Application" assignment — mirroring the structure and conventions of the reference `coderepo-react-node-calendar` repository.*
+
+</div>
