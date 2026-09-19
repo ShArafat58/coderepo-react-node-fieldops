@@ -334,3 +334,23 @@ textarea:focus-visible {
 .icon-button:hover {
     background: var(--hover);
 }
+
+.login-screen { display: grid; place-content: center; min-height: 100dvh; background: var(--surface-muted); }
+.login-card { display: grid; width: min(360px, 90vw); gap: 16px; padding: 32px 28px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.login-brand { display: flex; align-items: center; gap: 12px; font-size: 22px; }
+.login-brand .brand-mark { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 8px; background: linear-gradient(135deg, #1a73e8 0 72%, #174ea6 72%); color: #fff; font-size: 17px; font-weight: 700; }
+.login-subtitle { margin: 0; color: var(--muted); font-size: 14px; }
+.login-error { padding: 10px 12px; border-radius: 8px; background: var(--danger-container); color: var(--danger-ink); font-size: 14px; }
+.login-field { display: grid; gap: 6px; font-size: 14px; }
+.login-field span { color: var(--muted); }
+.login-field input { min-height: 42px; padding: 0 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--field); color: var(--ink-strong); }
+.login-field input:focus-visible { border-color: var(--accent); }
+.login-submit { min-height: 42px; margin-top: 8px; border: 0; border-radius: 8px; background: var(--accent-container); color: var(--accent-container-ink); font-size: 15px; font-weight: 500; }
+.login-submit:disabled { opacity: .6; cursor: not-allowed; }
+.login-submit:not(:disabled):hover { background: var(--accent-container-hover); }
+.dashboard-shell { display: grid; grid-template-rows: 64px 1fr; min-height: 100dvh; background: var(--surface-muted); }
+.dashboard-header { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--divider); background: var(--surface); }
+.dashboard-user { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 14px; }
+.dashboard-user button { min-height: 36px; padding: 0 14px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--ink-strong); }
+.dashboard-user button:hover { background: var(--hover); }
+.dashboard-body { padding: 24px; color: var(--ink); }
