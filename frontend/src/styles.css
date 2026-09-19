@@ -458,4 +458,17 @@ textarea:focus-visible {
 .hint-text { font-size: 12px; color: var(--muted); }
 .warning-banner { padding: 10px 12px; border-radius: 8px; background: var(--warning-container); color: var(--warning-ink); font-size: 13px; }
 
+.job-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.job-filters select, .job-filters input[type="date"] { min-height: 38px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--field); color: var(--ink-strong); font-size: 13px; }
+.job-filters button { min-height: 38px; padding: 0 14px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--ink-strong); font-size: 13px; }
+.job-filters button:hover { background: var(--hover); }
+.saved-views-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.saved-view-chip { display: flex; align-items: stretch; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+.saved-view-chip button:first-child { padding: 6px 12px; border: 0; background: var(--accent-tint); color: var(--accent-ink); font-size: 13px; }
+.saved-view-remove { padding: 6px 10px; border: 0; border-left: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; }
+.saved-view-remove:hover { background: var(--hover); }
+.load-more-row { display: flex; justify-content: center; padding: 8px 0; }
+.load-more-row button { min-height: 38px; padding: 0 20px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--ink-strong); }
+.load-more-row button:hover { background: var(--hover); }
+
 

@@ -3,9 +3,11 @@ import { customerApi } from "../customers/customer.api.js";
 import { serviceTypeApi } from "../service-catalog/service-type.api.js";
 import { technicianApi } from "../technicians/technician.api.js";
 import { jobApi } from "./job.api.js";
+import { savedViewApi } from "./saved-view.api.js";
 
 const STATUS_LABELS = { requested: "Requested", scheduled: "Scheduled", en_route: "En route", in_progress: "In progress", completed: "Completed", invoiced: "Invoiced", cancelled: "Cancelled" };
 const NEXT_STATUS = { requested: ["scheduled", "cancelled"], scheduled: ["en_route", "cancelled"], en_route: ["in_progress", "cancelled"], in_progress: ["completed", "cancelled"], completed: ["invoiced"], invoiced: [], cancelled: [] };
+const EMPTY_FILTERS = { status: "", technicianId: "", customerId: "", dateFrom: "", dateTo: "" };
 
 function toLocalInputValue(date) {
 	if (!date) return "";
@@ -207,6 +209,34 @@ function CompletionModal({ onCancel, onConfirm }) {
 	);
 }
 
+function SaveViewModal({ onCancel, onConfirm }) {
+	const [name, setName] = useState("");
+	const [saving, setSaving] = useState(false);
+
+	const handleSubmit = async (event) => {
+		event.preventDefault();
+		setSaving(true);
+		await onConfirm(name.trim());
+		setSaving(false);
+	};
+
+	return (
+		<div className="modal-overlay" onClick={onCancel} role="presentation">
+			<form className="modal-card" onClick={(event) => event.stopPropagation()} onSubmit={handleSubmit}>
+				<h2>Save current filters</h2>
+				<label className="login-field">
+					<span>View name</span>
+					<input onChange={(event) => setName(event.target.value)} placeholder="e.g. My jobs today" required type="text" value={name} />
+				</label>
+				<div className="modal-actions">
+					<button onClick={onCancel} type="button">Cancel</button>
+					<button className="primary-button" disabled={saving} type="submit">{saving ? "Saving…" : "Save view"}</button>
+				</div>
+			</form>
+		</div>
+	);
+}
+
 function formatSchedule(job) {
 	if (!job.scheduledStartAt) return "Not scheduled";
 	const start = new Date(job.scheduledStartAt);
@@ -219,17 +249,30 @@ function formatSchedule(job) {
 
 export function JobList({ canCreate }) {
 	const [jobs, setJobs] = useState([]);
+	const [nextCursor, setNextCursor] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [loadingMore, setLoadingMore] = useState(false);
 	const [error, setError] = useState("");
 	const [formOpen, setFormOpen] = useState(false);
 	const [assigningJob, setAssigningJob] = useState(null);
 	const [completingJob, setCompletingJob] = useState(null);
+	const [filters, setFilters] = useState(EMPTY_FILTERS);
+	const [technicians, setTechnicians] = useState([]);
+	const [savedViews, setSavedViews] = useState([]);
+	const [saveViewOpen, setSaveViewOpen] = useState(false);
 
-	const load = useCallback(async () => {
+	useEffect(() => {
+		technicianApi.list().then(setTechnicians).catch(() => {});
+		savedViewApi.list().then(setSavedViews).catch(() => {});
+	}, []);
+
+	const load = useCallback(async (activeFilters) => {
 		try {
 			setLoading(true);
 			setError("");
-			setJobs(await jobApi.list());
+			const result = await jobApi.list(activeFilters);
+			setJobs(result.items);
+			setNextCursor(result.nextCursor);
 		} catch (requestError) {
 			setError(requestError.message);
 		} finally {
@@ -237,18 +280,42 @@ export function JobList({ canCreate }) {
 		}
 	}, []);
 
-	useEffect(() => { load(); }, [load]);
+	useEffect(() => { load(filters); }, [filters, load]);
+
+	const loadMore = async () => {
+		try {
+			setLoadingMore(true);
+			const result = await jobApi.list({ ...filters, cursor: nextCursor });
+			setJobs((items) => [...items, ...result.items]);
+			setNextCursor(result.nextCursor);
+		} finally {
+			setLoadingMore(false);
+		}
+	};
+
+	const updateFilter = (key, value) => setFilters((current) => ({ ...current, [key]: value }));
+	const clearFilters = () => setFilters(EMPTY_FILTERS);
+	const applySavedView = (view) => setFilters({ ...EMPTY_FILTERS, ...view.filters });
+	const saveCurrentView = async (name) => {
+		const created = await savedViewApi.create({ name, filters });
+		setSavedViews((views) => [...views, created]);
+		setSaveViewOpen(false);
+	};
+	const removeSavedView = async (view) => {
+		await savedViewApi.remove(view._id);
+		setSavedViews((views) => views.filter((item) => item._id !== view._id));
+	};
 
 	const createJob = async (payload) => {
 		await jobApi.create(payload);
 		setFormOpen(false);
-		await load();
+		await load(filters);
 	};
 
 	const confirmAssign = async (technicianId) => {
 		await jobApi.assign(assigningJob._id, technicianId);
 		setAssigningJob(null);
-		await load();
+		await load(filters);
 	};
 
 	const changeStatus = async (job, status) => {
@@ -257,14 +324,16 @@ export function JobList({ canCreate }) {
 			return;
 		}
 		await jobApi.updateStatus(job._id, status);
-		await load();
+		await load(filters);
 	};
 
 	const confirmCompletion = async (note) => {
 		await jobApi.updateStatus(completingJob._id, "completed", note);
 		setCompletingJob(null);
-		await load();
+		await load(filters);
 	};
+
+	const hasActiveFilters = Object.values(filters).some(Boolean);
 
 	return (
 		<div className="customers-view">
@@ -272,47 +341,79 @@ export function JobList({ canCreate }) {
 				<h2 className="section-title">Jobs</h2>
 				{canCreate && <button className="primary-button" onClick={() => setFormOpen(true)} type="button">+ New job</button>}
 			</div>
-			{error && <div className="service-error" role="alert"><span>{error}</span><button onClick={load} type="button">Retry</button></div>}
+			{savedViews.length > 0 && (
+				<div className="saved-views-row">
+					{savedViews.map((view) => (
+						<div className="saved-view-chip" key={view._id}>
+							<button onClick={() => applySavedView(view)} type="button">{view.name}</button>
+							<button aria-label={`Remove ${view.name}`} className="saved-view-remove" onClick={() => removeSavedView(view)} type="button">✕</button>
+						</div>
+					))}
+				</div>
+			)}
+			<div className="job-filters">
+				<select onChange={(event) => updateFilter("status", event.target.value)} value={filters.status}>
+					<option value="">All statuses</option>
+					{Object.entries(STATUS_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+				</select>
+				<select onChange={(event) => updateFilter("technicianId", event.target.value)} value={filters.technicianId}>
+					<option value="">All technicians</option>
+					{technicians.map((technician) => <option key={technician._id} value={technician._id}>{technician.userId.name}</option>)}
+				</select>
+				<input onChange={(event) => updateFilter("dateFrom", event.target.value)} type="date" value={filters.dateFrom} />
+				<input onChange={(event) => updateFilter("dateTo", event.target.value)} type="date" value={filters.dateTo} />
+				{hasActiveFilters && <button onClick={clearFilters} type="button">Clear</button>}
+				{hasActiveFilters && <button onClick={() => setSaveViewOpen(true)} type="button">Save view</button>}
+			</div>
+			{error && <div className="service-error" role="alert"><span>{error}</span><button onClick={() => load(filters)} type="button">Retry</button></div>}
 			{loading ? (
 				<div className="customers-loading" aria-label="Loading jobs" role="status">
 					{Array.from({ length: 4 }, (_, index) => <div className="customers-loading-row" key={index} />)}
 				</div>
 			) : jobs.length === 0 ? (
 				<div className="empty-state">
-					<h2>No jobs yet</h2>
-					<p>{canCreate ? "Create your first job to get started." : "No jobs have been assigned to you yet."}</p>
+					<h2>No jobs found</h2>
+					<p>{hasActiveFilters ? "Try adjusting or clearing your filters." : canCreate ? "Create your first job to get started." : "No jobs have been assigned to you yet."}</p>
 				</div>
 			) : (
-				<ul className="job-cards">
-					{jobs.map((job) => (
-						<li className="job-card" key={job._id}>
-							<div className="job-card-main">
-								<div className="job-card-title">
-									<strong>{job.serviceTypeId?.name || "Unknown service"}</strong>
-									<span className={`status-pill status-${job.status}`}>{STATUS_LABELS[job.status]}</span>
+				<>
+					<ul className="job-cards">
+						{jobs.map((job) => (
+							<li className="job-card" key={job._id}>
+								<div className="job-card-main">
+									<div className="job-card-title">
+										<strong>{job.serviceTypeId?.name || "Unknown service"}</strong>
+										<span className={`status-pill status-${job.status}`}>{STATUS_LABELS[job.status]}</span>
+									</div>
+									<p className="job-card-detail">{job.customerId?.name} · {job.propertyId?.address}</p>
+									<p className="job-card-detail">{formatSchedule(job)}</p>
+									<p className="job-card-detail">Technician: {job.technicianId?.userId?.name || "Unassigned"}</p>
+									{job.completionNotes && <p className="job-card-notes">"{job.completionNotes}"</p>}
 								</div>
-								<p className="job-card-detail">{job.customerId?.name} · {job.propertyId?.address}</p>
-								<p className="job-card-detail">{formatSchedule(job)}</p>
-								<p className="job-card-detail">Technician: {job.technicianId?.userId?.name || "Unassigned"}</p>
-								{job.completionNotes && <p className="job-card-notes">"{job.completionNotes}"</p>}
-							</div>
-							<div className="job-card-actions">
-								{canCreate && !job.technicianId && ["requested", "scheduled"].includes(job.status) && (
-									<button onClick={() => setAssigningJob(job)} type="button">Assign technician</button>
-								)}
-								{NEXT_STATUS[job.status]?.map((nextStatus) => (
-									<button className={nextStatus === "cancelled" ? "danger-link" : ""} key={nextStatus} onClick={() => changeStatus(job, nextStatus)} type="button">
-										{STATUS_LABELS[nextStatus]}
-									</button>
-								))}
-							</div>
-						</li>
-					))}
-				</ul>
+								<div className="job-card-actions">
+									{canCreate && !job.technicianId && ["requested", "scheduled"].includes(job.status) && (
+										<button onClick={() => setAssigningJob(job)} type="button">Assign technician</button>
+									)}
+									{NEXT_STATUS[job.status]?.map((nextStatus) => (
+										<button className={nextStatus === "cancelled" ? "danger-link" : ""} key={nextStatus} onClick={() => changeStatus(job, nextStatus)} type="button">
+											{STATUS_LABELS[nextStatus]}
+										</button>
+									))}
+								</div>
+							</li>
+						))}
+					</ul>
+					{nextCursor && (
+						<div className="load-more-row">
+							<button disabled={loadingMore} onClick={loadMore} type="button">{loadingMore ? "Loading…" : "Load more"}</button>
+						</div>
+					)}
+				</>
 			)}
 			{formOpen && <JobForm onCancel={() => setFormOpen(false)} onSave={createJob} />}
 			{assigningJob && <AssignModal job={assigningJob} onCancel={() => setAssigningJob(null)} onConfirm={confirmAssign} />}
 			{completingJob && <CompletionModal onCancel={() => setCompletingJob(null)} onConfirm={confirmCompletion} />}
+			{saveViewOpen && <SaveViewModal onCancel={() => setSaveViewOpen(false)} onConfirm={saveCurrentView} />}
 		</div>
 	);
 }

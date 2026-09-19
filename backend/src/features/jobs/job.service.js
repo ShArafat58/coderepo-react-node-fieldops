@@ -90,13 +90,19 @@ async function ensureAssignable(technicianId, startAt, endAt, excludeJobId) {
 }
 
 export const jobService = {
-	async list(user) {
+	async list(user, query) {
+		const filters = query || {};
+		let scopeFilter = {};
 		if (user.role === "technician") {
 			const technician = await technicianRepository.findByUserId(user._id);
-			if (!technician) return [];
-			return jobRepository.findByTechnicianId(technician._id);
+			if (!technician) return { items: [], nextCursor: null };
+			scopeFilter = { technicianId: technician._id };
 		}
-		return jobRepository.findAll();
+		const limit = 20;
+		const results = await jobRepository.findFiltered(filters, scopeFilter, filters.cursor || null, limit);
+		const hasMore = results.length > limit;
+		const items = hasMore ? results.slice(0, limit) : results;
+		return { items, nextCursor: hasMore ? String(items[items.length - 1]._id) : null };
 	},
 	async getById(id) {
 		ensureObjectId(id);

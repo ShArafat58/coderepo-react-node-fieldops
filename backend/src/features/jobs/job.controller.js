@@ -23,7 +23,15 @@ const assignSchema = z.object({ technicianId: objectIdSchema }).strict();
 
 export async function listJobs(request, response, next) {
 	try {
-		response.json({ data: await jobService.list(request.user) });
+		const querySchema = z.object({
+			status: z.string().optional(),
+			technicianId: z.string().optional(),
+			customerId: z.string().optional(),
+			dateFrom: z.string().optional(),
+			dateTo: z.string().optional(),
+			cursor: z.string().optional(),
+		});
+		response.json({ data: await jobService.list(request.user, querySchema.parse(request.query)) });
 	} catch (error) {
 		next(error);
 	}

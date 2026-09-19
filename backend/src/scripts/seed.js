@@ -7,6 +7,9 @@ import { Technician } from "../features/technicians/technician.model.js";
 import { Customer } from "../features/customers/customer.model.js";
 import { Property } from "../features/customers/property.model.js";
 import { ServiceType } from "../features/service-catalog/service-type.model.js";
+import { Job } from "../features/jobs/job.model.js";
+import { JobStatusHistory } from "../features/jobs/job-status-history.model.js";
+import { SavedView } from "../features/jobs/saved-view.model.js";
 
 dotenv.config({ quiet: true });
 
@@ -42,6 +45,13 @@ const serviceTypesSeed = [
 	{ name: "Mosquito Treatment", description: "Yard treatment to reduce mosquito populations.", estimatedDurationMinutes: 30, basePrice: 79 },
 ];
 
+function daysAgo(days, hour, minute) {
+	const date = new Date();
+	date.setUTCDate(date.getUTCDate() - days);
+	date.setUTCHours(hour - 6, minute, 0, 0);
+	return date;
+}
+
 async function seed() {
 	const config = initConfig();
 	await connectDatabase(config.mongodbUri);
@@ -52,7 +62,10 @@ async function seed() {
 	console.log("");
 
 	console.log("Clearing existing collections...");
-	await Promise.all([User.deleteMany({}), Technician.deleteMany({}), Customer.deleteMany({}), Property.deleteMany({}), ServiceType.deleteMany({})]);
+	await Promise.all([
+		User.deleteMany({}), Technician.deleteMany({}), Customer.deleteMany({}), Property.deleteMany({}),
+		ServiceType.deleteMany({}), Job.deleteMany({}), JobStatusHistory.deleteMany({}), SavedView.deleteMany({}),
+	]);
 
 	console.log("Seeding users...");
 	const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
@@ -65,7 +78,7 @@ async function seed() {
 	console.log(`  Created ${1 + technicianUsers.length} users`);
 
 	console.log("Seeding technician profiles...");
-	await Technician.insertMany(
+	const technicians = await Technician.insertMany(
 		technicianUsers.map((user, index) => ({
 			userId: user._id,
 			skills: index === 0 ? ["General Pest Control", "Termite Treatment"] : index === 1 ? ["General Pest Control"] : ["Termite Treatment", "Rodent Control"],
@@ -75,18 +88,57 @@ async function seed() {
 	console.log(`  Created ${technicianUsers.length} technician profiles`);
 
 	console.log("Seeding customers and properties...");
+	const customers = [];
+	const propertiesByCustomer = [];
 	let propertyCount = 0;
 	for (let index = 0; index < customersSeed.length; index += 1) {
 		const customer = await Customer.create(customersSeed[index]);
-		const properties = propertiesSeed[index].map((property) => ({ ...property, customerId: customer._id }));
-		await Property.insertMany(properties);
+		const properties = await Property.insertMany(propertiesSeed[index].map((property) => ({ ...property, customerId: customer._id })));
+		customers.push(customer);
+		propertiesByCustomer.push(properties);
 		propertyCount += properties.length;
 	}
 	console.log(`  Created ${customersSeed.length} customers and ${propertyCount} properties`);
 
 	console.log("Seeding service catalog...");
-	await ServiceType.insertMany(serviceTypesSeed);
+	const serviceTypes = await ServiceType.insertMany(serviceTypesSeed);
 	console.log(`  Created ${serviceTypesSeed.length} service types`);
+
+	console.log("Seeding sample jobs...");
+	const jobsSeed = [
+		{ c: 0, p: 0, s: 0, tech: 0, status: "requested", daysAgo: -2, hour: 9 },
+		{ c: 1, p: 0, s: 0, tech: 1, status: "scheduled", daysAgo: -1, hour: 10 },
+		{ c: 2, p: 0, s: 2, tech: 0, status: "en_route", daysAgo: 0, hour: 13 },
+		{ c: 3, p: 0, s: 4, tech: null, status: "requested", daysAgo: -3, hour: 11 },
+		{ c: 4, p: 0, s: 1, tech: 2, status: "in_progress", daysAgo: 0, hour: 9 },
+		{ c: 0, p: 0, s: 3, tech: 2, status: "completed", daysAgo: 3, hour: 14 },
+		{ c: 1, p: 0, s: 0, tech: 1, status: "invoiced", daysAgo: 7, hour: 10 },
+		{ c: 4, p: 1, s: 2, tech: null, status: "cancelled", daysAgo: 5, hour: 9 },
+	];
+	let jobCount = 0;
+	for (const spec of jobsSeed) {
+		const serviceType = serviceTypes[spec.s];
+		const scheduledStartAt = daysAgo(-spec.daysAgo, spec.hour, 0);
+		const scheduledEndAt = new Date(scheduledStartAt.getTime() + serviceType.estimatedDurationMinutes * 60000);
+		const job = await Job.create({
+			customerId: customers[spec.c]._id,
+			propertyId: propertiesByCustomer[spec.c][spec.p]._id,
+			serviceTypeId: serviceType._id,
+			technicianId: spec.tech !== null ? technicians[spec.tech]._id : null,
+			status: spec.status,
+			scheduledStartAt,
+			scheduledEndAt,
+			price: serviceType.basePrice,
+			completionNotes: ["completed", "invoiced"].includes(spec.status) ? "Service completed as requested." : "",
+			createdBy: admin._id,
+		});
+		await JobStatusHistory.create({ jobId: job._id, fromStatus: null, toStatus: "requested", changedBy: admin._id, note: "Job created." });
+		if (spec.status !== "requested") {
+			await JobStatusHistory.create({ jobId: job._id, fromStatus: "requested", toStatus: spec.status, changedBy: admin._id, note: "" });
+		}
+		jobCount += 1;
+	}
+	console.log(`  Created ${jobCount} jobs with history`);
 
 	console.log("");
 	console.log("=".repeat(40));
