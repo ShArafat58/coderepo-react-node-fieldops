@@ -411,4 +411,49 @@ textarea:focus-visible {
 .status-pill.active { background: var(--success-container); color: var(--success); }
 .status-pill.inactive { background: var(--field); color: var(--muted); }
 .inactive-row td { opacity: .6; }
+
+.day-picker { display: flex; gap: 6px; }
+.day-picker button { min-width: 40px; min-height: 36px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--muted); font-size: 13px; }
+.day-picker button.active { border-color: var(--accent); background: var(--accent-tint); color: var(--accent-ink); }
+
+.dashboard-header { box-shadow: 0 1px 0 var(--divider); transition: box-shadow 150ms ease; }
+.dashboard-nav button { position: relative; transition: background 150ms ease, color 150ms ease; }
+.dashboard-nav button::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 2px; height: 2px; border-radius: 2px; background: var(--accent); transform: scaleX(0); transition: transform 150ms ease; }
+.dashboard-nav button.active::after { transform: scaleX(1); }
+.dashboard-user { gap: 10px !important; }
+.dashboard-user-info { display: flex; flex-direction: column; gap: 1px; line-height: 1.2; }
+.dashboard-user-info strong { font-size: 13px; font-weight: 500; color: var(--ink-strong); }
+.dashboard-user-role { font-size: 11px; color: var(--muted); text-transform: capitalize; }
+.user-avatar { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: linear-gradient(135deg, #1a73e8 0 72%, #174ea6 72%); color: #fff; font-size: 13px; font-weight: 600; letter-spacing: .3px; }
+.sign-out-button { transition: background 150ms ease, border-color 150ms ease; }
+.overview-view { display: grid; gap: 6px; max-width: 900px; }
+.overview-subtitle { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+.stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.stat-card { display: grid; gap: 6px; padding: 18px 20px; border: 1px solid var(--divider); border-radius: 14px; background: var(--surface); transition: box-shadow 150ms ease, transform 150ms ease; }
+.stat-card:hover { box-shadow: 0 4px 16px rgb(0 0 0 / 20%); transform: translateY(-2px); }
+.stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+.stat-value { font-size: 18px; color: var(--ink-strong); font-weight: 500; }
+.customers-table tr { transition: background 120ms ease; }
+.primary-button, .modal-actions button, .row-actions button, .day-picker button { transition: background 150ms ease, border-color 150ms ease, transform 100ms ease; }
+.primary-button:active { transform: scale(.97); }
+
+.job-cards { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.job-card { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 18px; border: 1px solid var(--divider); border-radius: 12px; background: var(--surface); }
+.job-card-main { display: grid; gap: 4px; min-width: 0; }
+.job-card-title { display: flex; align-items: center; gap: 10px; }
+.job-card-title strong { font-size: 15px; }
+.job-card-detail { margin: 0; color: var(--muted); font-size: 13px; }
+.job-card-notes { margin: 4px 0 0; padding: 8px 10px; border-radius: 8px; background: var(--surface-muted); color: var(--ink); font-size: 13px; font-style: italic; }
+.job-card-actions { display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; }
+.job-card-actions button { min-height: 34px; padding: 0 12px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--ink-strong); font-size: 13px; }
+.job-card-actions button:hover { background: var(--hover); }
+.status-requested { background: var(--field); color: var(--muted); }
+.status-scheduled { background: var(--accent-tint); color: var(--accent-ink); }
+.status-en_route { background: var(--warning-container); color: var(--warning-ink); }
+.status-in_progress { background: var(--warning-container); color: var(--warning-ink); }
+.status-completed { background: var(--success-container); color: var(--success); }
+.status-invoiced { background: var(--success-container); color: var(--success); }
+.status-cancelled { background: var(--danger-container); color: var(--danger-ink); }
+.hint-text { font-size: 12px; color: var(--muted); }
+
 

@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { authApi } from "./features/auth/auth.api.js";
 import { Login } from "./features/auth/Login.jsx";
 import { CustomerList } from "./features/customers/CustomerList.jsx";
+import { JobList } from "./features/jobs/JobList.jsx";
 import { ServiceCatalog } from "./features/service-catalog/ServiceCatalog.jsx";
+import { TechnicianList } from "./features/technicians/TechnicianList.jsx";
 import { hasToken, setToken } from "./shared/api/client.js";
 
 function AppBootScreen() {
@@ -19,8 +21,45 @@ function AppBootScreen() {
 	);
 }
 
+function UserAvatar({ name }) {
+	const initials = name.split(" ").map((part) => part[0]).slice(0, 2).join("").toUpperCase();
+	return <span className="user-avatar" aria-hidden="true">{initials}</span>;
+}
+
+function Overview({ user }) {
+	const stats = [
+		{ label: "Your role", value: user.role === "admin" ? "Administrator" : "Technician" },
+		{ label: "Account status", value: "Active" },
+		{ label: "Signed in as", value: user.email },
+	];
+	return (
+		<div className="overview-view">
+			<h2 className="section-title">Welcome back, {user.name.split(" ")[0]}</h2>
+			<p className="overview-subtitle">Here's a quick snapshot of your FieldOps account. More operational insights are on the way.</p>
+			<div className="stat-cards">
+				{stats.map((stat) => (
+					<div className="stat-card" key={stat.label}>
+						<span className="stat-label">{stat.label}</span>
+						<span className="stat-value">{stat.value}</span>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}
+
+const NAV_ITEMS = [
+	{ id: "overview", label: "Overview", roles: ["admin", "technician"] },
+	{ id: "jobs", label: "Jobs", roles: ["admin", "technician"] },
+	{ id: "customers", label: "Customers", roles: ["admin", "technician"] },
+	{ id: "services", label: "Services", roles: ["admin", "technician"] },
+	{ id: "technicians", label: "Technicians", roles: ["admin"] },
+];
+
 function Dashboard({ user, onLogout }) {
 	const [view, setView] = useState("overview");
+	const visibleItems = NAV_ITEMS.filter((item) => item.roles.includes(user.role));
+
 	return (
 		<main className="dashboard-shell">
 			<header className="dashboard-header">
@@ -29,19 +68,25 @@ function Dashboard({ user, onLogout }) {
 					<strong>FieldOps</strong>
 				</div>
 				<nav className="dashboard-nav">
-					<button className={view === "overview" ? "active" : ""} onClick={() => setView("overview")} type="button">Overview</button>
-					<button className={view === "customers" ? "active" : ""} onClick={() => setView("customers")} type="button">Customers</button>
-					<button className={view === "services" ? "active" : ""} onClick={() => setView("services")} type="button">Services</button>
+					{visibleItems.map((item) => (
+						<button className={view === item.id ? "active" : ""} key={item.id} onClick={() => setView(item.id)} type="button">{item.label}</button>
+					))}
 				</nav>
 				<div className="dashboard-user">
-					<span>{user.name} · {user.role}</span>
-					<button onClick={onLogout} type="button">Sign out</button>
+					<UserAvatar name={user.name} />
+					<span className="dashboard-user-info">
+						<strong>{user.name}</strong>
+						<span className="dashboard-user-role">{user.role}</span>
+					</span>
+					<button className="sign-out-button" onClick={onLogout} type="button">Sign out</button>
 				</div>
 			</header>
 			<div className="dashboard-body">
-				{view === "overview" && <p>Signed in as {user.email}. More features are on the way.</p>}
+				{view === "overview" && <Overview user={user} />}
+				{view === "jobs" && <JobList canCreate={user.role === "admin"} />}
 				{view === "customers" && <CustomerList canManage={user.role === "admin"} />}
 				{view === "services" && <ServiceCatalog canManage={user.role === "admin"} />}
+				{view === "technicians" && user.role === "admin" && <TechnicianList canManage={user.role === "admin"} />}
 			</div>
 		</main>
 	);
