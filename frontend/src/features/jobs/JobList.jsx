@@ -209,6 +209,54 @@ function CompletionModal({ onCancel, onConfirm }) {
 	);
 }
 
+function HistoryModal({ jobId, onCancel }) {
+	const [job, setJob] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState("");
+
+	useEffect(() => {
+		let active = true;
+		jobApi.get(jobId).then((result) => {
+			if (active) setJob(result);
+		}).catch((requestError) => {
+			if (active) setError(requestError.message);
+		}).finally(() => {
+			if (active) setLoading(false);
+		});
+		return () => { active = false; };
+	}, [jobId]);
+
+	return (
+		<div className="modal-overlay" onClick={onCancel} role="presentation">
+			<div className="modal-card history-modal" onClick={(event) => event.stopPropagation()}>
+				<h2>Job history</h2>
+				{loading && <p className="detail-loading">Loading history…</p>}
+				{error && <div className="login-error" role="alert">{error}</div>}
+				{job && (
+					<ul className="history-timeline">
+						{job.history.map((entry) => (
+							<li className="history-entry" key={entry._id}>
+								<div className="history-dot" />
+								<div className="history-content">
+									<div className="history-line">
+										<strong>{entry.fromStatus ? `${STATUS_LABELS[entry.fromStatus]} → ${STATUS_LABELS[entry.toStatus]}` : `Job ${STATUS_LABELS[entry.toStatus]}`}</strong>
+										<span className="history-time">{new Date(entry.createdAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</span>
+									</div>
+									<p className="history-meta">by {entry.changedBy?.name || "System"}</p>
+									{entry.note && <p className="history-note">{entry.note}</p>}
+								</div>
+							</li>
+						))}
+					</ul>
+				)}
+				<div className="modal-actions">
+					<button onClick={onCancel} type="button">Close</button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
 function SaveViewModal({ onCancel, onConfirm }) {
 	const [name, setName] = useState("");
 	const [saving, setSaving] = useState(false);
@@ -256,6 +304,7 @@ export function JobList({ canCreate }) {
 	const [formOpen, setFormOpen] = useState(false);
 	const [assigningJob, setAssigningJob] = useState(null);
 	const [completingJob, setCompletingJob] = useState(null);
+	const [historyJobId, setHistoryJobId] = useState(null);
 	const [filters, setFilters] = useState(EMPTY_FILTERS);
 	const [technicians, setTechnicians] = useState([]);
 	const [savedViews, setSavedViews] = useState([]);
@@ -391,6 +440,7 @@ export function JobList({ canCreate }) {
 									{job.completionNotes && <p className="job-card-notes">"{job.completionNotes}"</p>}
 								</div>
 								<div className="job-card-actions">
+									<button onClick={() => setHistoryJobId(job._id)} type="button">View history</button>
 									{canCreate && !job.technicianId && ["requested", "scheduled"].includes(job.status) && (
 										<button onClick={() => setAssigningJob(job)} type="button">Assign technician</button>
 									)}
@@ -413,6 +463,7 @@ export function JobList({ canCreate }) {
 			{formOpen && <JobForm onCancel={() => setFormOpen(false)} onSave={createJob} />}
 			{assigningJob && <AssignModal job={assigningJob} onCancel={() => setAssigningJob(null)} onConfirm={confirmAssign} />}
 			{completingJob && <CompletionModal onCancel={() => setCompletingJob(null)} onConfirm={confirmCompletion} />}
+			{historyJobId && <HistoryModal jobId={historyJobId} onCancel={() => setHistoryJobId(null)} />}
 			{saveViewOpen && <SaveViewModal onCancel={() => setSaveViewOpen(false)} onConfirm={saveCurrentView} />}
 		</div>
 	);

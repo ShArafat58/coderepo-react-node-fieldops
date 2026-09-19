@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { authRouter } from "./features/auth/auth.routes.js";
 import { customerRouter } from "./features/customers/customer.routes.js";
 import { propertyRouter } from "./features/customers/property.routes.js";
+import { dashboardRouter } from "./features/dashboard/dashboard.routes.js";
 import { jobRouter } from "./features/jobs/job.routes.js";
 import { savedViewRouter } from "./features/jobs/saved-view.routes.js";
 import { serviceTypeRouter } from "./features/service-catalog/service-type.routes.js";
@@ -27,6 +28,7 @@ export function createApp() {
 	app.use("/api/v1/technicians", requireAuth, technicianRouter);
 	app.use("/api/v1/jobs", requireAuth, jobRouter);
 	app.use("/api/v1/saved-views", requireAuth, savedViewRouter);
+	app.use("/api/v1/dashboard", requireAuth, dashboardRouter);
 	app.use(notFoundHandler);
 	app.use(errorHandler);
 	return app;

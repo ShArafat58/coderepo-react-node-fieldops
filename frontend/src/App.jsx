@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { authApi } from "./features/auth/auth.api.js";
 import { Login } from "./features/auth/Login.jsx";
 import { CustomerList } from "./features/customers/CustomerList.jsx";
+import { Dashboard } from "./features/dashboard/Dashboard.jsx";
 import { JobList } from "./features/jobs/JobList.jsx";
 import { ServiceCatalog } from "./features/service-catalog/ServiceCatalog.jsx";
 import { TechnicianList } from "./features/technicians/TechnicianList.jsx";
@@ -26,16 +27,16 @@ function UserAvatar({ name }) {
 	return <span className="user-avatar" aria-hidden="true">{initials}</span>;
 }
 
-function Overview({ user }) {
+function TechnicianOverview({ user }) {
 	const stats = [
-		{ label: "Your role", value: user.role === "admin" ? "Administrator" : "Technician" },
+		{ label: "Your role", value: "Technician" },
 		{ label: "Account status", value: "Active" },
 		{ label: "Signed in as", value: user.email },
 	];
 	return (
 		<div className="overview-view">
 			<h2 className="section-title">Welcome back, {user.name.split(" ")[0]}</h2>
-			<p className="overview-subtitle">Here's a quick snapshot of your FieldOps account. More operational insights are on the way.</p>
+			<p className="overview-subtitle">Check the Jobs tab for your assigned work.</p>
 			<div className="stat-cards">
 				{stats.map((stat) => (
 					<div className="stat-card" key={stat.label}>
@@ -56,7 +57,7 @@ const NAV_ITEMS = [
 	{ id: "technicians", label: "Technicians", roles: ["admin"] },
 ];
 
-function Dashboard({ user, onLogout }) {
+function DashboardShell({ user, onLogout }) {
 	const [view, setView] = useState("overview");
 	const visibleItems = NAV_ITEMS.filter((item) => item.roles.includes(user.role));
 
@@ -82,7 +83,7 @@ function Dashboard({ user, onLogout }) {
 				</div>
 			</header>
 			<div className="dashboard-body">
-				{view === "overview" && <Overview user={user} />}
+				{view === "overview" && (user.role === "admin" ? <Dashboard /> : <TechnicianOverview user={user} />)}
 				{view === "jobs" && <JobList canCreate={user.role === "admin"} />}
 				{view === "customers" && <CustomerList canManage={user.role === "admin"} />}
 				{view === "services" && <ServiceCatalog canManage={user.role === "admin"} />}
@@ -153,5 +154,5 @@ export default function App() {
 
 	if (bootstrapping) return <AppBootScreen />;
 	if (!user) return <Login error={authError} loading={authLoading} onLogin={login} />;
-	return <Dashboard onLogout={logout} user={user} />;
+	return <DashboardShell onLogout={logout} user={user} />;
 }
