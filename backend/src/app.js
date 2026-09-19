@@ -2,6 +2,9 @@ import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
 import { authRouter } from "./features/auth/auth.routes.js";
+import { customerRouter } from "./features/customers/customer.routes.js";
+import { propertyRouter } from "./features/customers/property.routes.js";
+import { requireAuth } from "./shared/middleware/auth.js";
 import { errorHandler, notFoundHandler } from "./shared/middleware/error-handler.js";
 
 export function createApp() {
@@ -14,6 +17,8 @@ export function createApp() {
 		response.status(database === "connected" ? 200 : 503).json({ data: { status: database === "connected" ? "ok" : "degraded", database } });
 	});
 	app.use("/api/v1/auth", authRouter);
+	app.use("/api/v1/customers", requireAuth, customerRouter);
+	app.use("/api/v1/properties", requireAuth, propertyRouter);
 	app.use(notFoundHandler);
 	app.use(errorHandler);
 	return app;

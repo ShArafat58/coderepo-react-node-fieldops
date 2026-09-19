@@ -4,10 +4,34 @@ import { connectDatabase, disconnectDatabase } from "../shared/config/database.j
 import { initConfig } from "../shared/config/index.js";
 import { User } from "../features/auth/user.model.js";
 import { Technician } from "../features/technicians/technician.model.js";
+import { Customer } from "../features/customers/customer.model.js";
+import { Property } from "../features/customers/property.model.js";
 
 dotenv.config({ quiet: true });
 
 const DEMO_PASSWORD = "password123";
+
+const customersSeed = [
+	{ name: "Dana Whitfield", phone: "555-0101", email: "dana.whitfield@example.com", notes: "Prefers morning appointments." },
+	{ name: "Marcus Webb", phone: "555-0102", email: "marcus.webb@example.com", notes: "" },
+	{ name: "Priya Chandra", phone: "555-0103", email: "priya.chandra@example.com", notes: "Has a dog on the property." },
+	{ name: "Oliver Grant", phone: "555-0104", email: "", notes: "" },
+	{ name: "Sofia Reyes", phone: "555-0105", email: "sofia.reyes@example.com", notes: "Commercial account, invoice to office." },
+];
+
+const propertiesSeed = [
+	[{ address: "482 Birchwood Lane, Springfield", propertyType: "residential", notes: "Side gate code 4521." }],
+	[{ address: "17 Commerce Park Drive, Springfield", propertyType: "commercial", notes: "" }],
+	[
+		{ address: "930 Maple Ridge Court, Springfield", propertyType: "residential", notes: "" },
+		{ address: "12 Lakeview Cottage Rd, Springfield", propertyType: "residential", notes: "Vacation rental." },
+	],
+	[{ address: "56 Ashgrove Street, Springfield", propertyType: "residential", notes: "" }],
+	[
+		{ address: "200 Industrial Pkwy Suite 4, Springfield", propertyType: "commercial", notes: "Front desk has a spare key." },
+		{ address: "204 Industrial Pkwy Suite 6, Springfield", propertyType: "commercial", notes: "" },
+	],
+];
 
 async function seed() {
 	const config = initConfig();
@@ -19,7 +43,7 @@ async function seed() {
 	console.log("");
 
 	console.log("Clearing existing collections...");
-	await Promise.all([User.deleteMany({}), Technician.deleteMany({})]);
+	await Promise.all([User.deleteMany({}), Technician.deleteMany({}), Customer.deleteMany({}), Property.deleteMany({})]);
 
 	console.log("Seeding users...");
 	const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
@@ -40,6 +64,16 @@ async function seed() {
 		})),
 	);
 	console.log(`  Created ${technicianUsers.length} technician profiles`);
+
+	console.log("Seeding customers and properties...");
+	let propertyCount = 0;
+	for (let index = 0; index < customersSeed.length; index += 1) {
+		const customer = await Customer.create(customersSeed[index]);
+		const properties = propertiesSeed[index].map((property) => ({ ...property, customerId: customer._id }));
+		await Property.insertMany(properties);
+		propertyCount += properties.length;
+	}
+	console.log(`  Created ${customersSeed.length} customers and ${propertyCount} properties`);
 
 	console.log("");
 	console.log("=".repeat(40));

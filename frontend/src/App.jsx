@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { authApi } from "./features/auth/auth.api.js";
 import { Login } from "./features/auth/Login.jsx";
+import { CustomerList } from "./features/customers/CustomerList.jsx";
 import { hasToken, setToken } from "./shared/api/client.js";
 
 function AppBootScreen() {
@@ -18,6 +19,7 @@ function AppBootScreen() {
 }
 
 function Dashboard({ user, onLogout }) {
+	const [view, setView] = useState("overview");
 	return (
 		<main className="dashboard-shell">
 			<header className="dashboard-header">
@@ -25,13 +27,18 @@ function Dashboard({ user, onLogout }) {
 					<span className="brand-mark">F</span>
 					<strong>FieldOps</strong>
 				</div>
+				<nav className="dashboard-nav">
+					<button className={view === "overview" ? "active" : ""} onClick={() => setView("overview")} type="button">Overview</button>
+					<button className={view === "customers" ? "active" : ""} onClick={() => setView("customers")} type="button">Customers</button>
+				</nav>
 				<div className="dashboard-user">
 					<span>{user.name} · {user.role}</span>
 					<button onClick={onLogout} type="button">Sign out</button>
 				</div>
 			</header>
 			<div className="dashboard-body">
-				<p>Signed in as {user.email}. More features are on the way.</p>
+				{view === "overview" && <p>Signed in as {user.email}. More features are on the way.</p>}
+				{view === "customers" && <CustomerList canManage={user.role === "admin"} />}
 			</div>
 		</main>
 	);
