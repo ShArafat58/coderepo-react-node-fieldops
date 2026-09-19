@@ -19,6 +19,7 @@ const detailsSchema = z.object({
 	scheduledEndAt: z.coerce.date().nullable(),
 	price: z.number().min(0).nullable(),
 }).partial().refine((value) => Object.keys(value).length > 0, "Provide at least one field to update.");
+const assignSchema = z.object({ technicianId: objectIdSchema }).strict();
 
 export async function listJobs(request, response, next) {
 	try {
@@ -37,6 +38,14 @@ export async function getJob(request, response, next) {
 export async function createJob(request, response, next) {
 	try {
 		response.status(201).json({ data: await jobService.create(createSchema.parse(request.body), request.user) });
+	} catch (error) {
+		next(error);
+	}
+}
+export async function assignTechnician(request, response, next) {
+	try {
+		const { technicianId } = assignSchema.parse(request.body);
+		response.json({ data: await jobService.assign(request.params.jobId, technicianId, request.user) });
 	} catch (error) {
 		next(error);
 	}

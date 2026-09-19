@@ -348,7 +348,8 @@ textarea:focus-visible {
 .login-submit { min-height: 42px; margin-top: 8px; border: 0; border-radius: 8px; background: var(--accent-container); color: var(--accent-container-ink); font-size: 15px; font-weight: 500; }
 .login-submit:disabled { opacity: .6; cursor: not-allowed; }
 .login-submit:not(:disabled):hover { background: var(--accent-container-hover); }
-.dashboard-shell { display: grid; grid-template-rows: 64px 1fr; min-height: 100dvh; background: var(--surface-muted); }
+.dashboard-shell { display: grid; grid-template-rows: 64px 1fr; height: 100dvh; background: var(--surface-muted); overflow: hidden; }
+.dashboard-body { overflow-y: auto; }
 .dashboard-header { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--divider); background: var(--surface); }
 .dashboard-user { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 14px; }
 .dashboard-user button { min-height: 36px; padding: 0 14px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--ink-strong); }
@@ -455,5 +456,6 @@ textarea:focus-visible {
 .status-invoiced { background: var(--success-container); color: var(--success); }
 .status-cancelled { background: var(--danger-container); color: var(--danger-ink); }
 .hint-text { font-size: 12px; color: var(--muted); }
+.warning-banner { padding: 10px 12px; border-radius: 8px; background: var(--warning-container); color: var(--warning-ink); font-size: 13px; }
 
 
