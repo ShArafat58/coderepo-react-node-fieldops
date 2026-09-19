@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { authApi } from "./features/auth/auth.api.js";
 import { Login } from "./features/auth/Login.jsx";
 import { CustomerList } from "./features/customers/CustomerList.jsx";
+import { ServiceCatalog } from "./features/service-catalog/ServiceCatalog.jsx";
 import { hasToken, setToken } from "./shared/api/client.js";
 
 function AppBootScreen() {
@@ -30,6 +31,7 @@ function Dashboard({ user, onLogout }) {
 				<nav className="dashboard-nav">
 					<button className={view === "overview" ? "active" : ""} onClick={() => setView("overview")} type="button">Overview</button>
 					<button className={view === "customers" ? "active" : ""} onClick={() => setView("customers")} type="button">Customers</button>
+					<button className={view === "services" ? "active" : ""} onClick={() => setView("services")} type="button">Services</button>
 				</nav>
 				<div className="dashboard-user">
 					<span>{user.name} · {user.role}</span>
@@ -39,6 +41,7 @@ function Dashboard({ user, onLogout }) {
 			<div className="dashboard-body">
 				{view === "overview" && <p>Signed in as {user.email}. More features are on the way.</p>}
 				{view === "customers" && <CustomerList canManage={user.role === "admin"} />}
+				{view === "services" && <ServiceCatalog canManage={user.role === "admin"} />}
 			</div>
 		</main>
 	);

@@ -6,6 +6,7 @@ import { User } from "../features/auth/user.model.js";
 import { Technician } from "../features/technicians/technician.model.js";
 import { Customer } from "../features/customers/customer.model.js";
 import { Property } from "../features/customers/property.model.js";
+import { ServiceType } from "../features/service-catalog/service-type.model.js";
 
 dotenv.config({ quiet: true });
 
@@ -33,6 +34,14 @@ const propertiesSeed = [
 	],
 ];
 
+const serviceTypesSeed = [
+	{ name: "General Pest Control", description: "Routine interior and exterior pest treatment.", estimatedDurationMinutes: 45, basePrice: 89 },
+	{ name: "Termite Inspection", description: "Full property inspection for termite activity and damage.", estimatedDurationMinutes: 60, basePrice: 129 },
+	{ name: "Termite Treatment", description: "Targeted termite treatment following an inspection.", estimatedDurationMinutes: 120, basePrice: 450 },
+	{ name: "Rodent Control", description: "Rodent exclusion, trapping, and follow-up service.", estimatedDurationMinutes: 60, basePrice: 149 },
+	{ name: "Mosquito Treatment", description: "Yard treatment to reduce mosquito populations.", estimatedDurationMinutes: 30, basePrice: 79 },
+];
+
 async function seed() {
 	const config = initConfig();
 	await connectDatabase(config.mongodbUri);
@@ -43,7 +52,7 @@ async function seed() {
 	console.log("");
 
 	console.log("Clearing existing collections...");
-	await Promise.all([User.deleteMany({}), Technician.deleteMany({}), Customer.deleteMany({}), Property.deleteMany({})]);
+	await Promise.all([User.deleteMany({}), Technician.deleteMany({}), Customer.deleteMany({}), Property.deleteMany({}), ServiceType.deleteMany({})]);
 
 	console.log("Seeding users...");
 	const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
@@ -74,6 +83,10 @@ async function seed() {
 		propertyCount += properties.length;
 	}
 	console.log(`  Created ${customersSeed.length} customers and ${propertyCount} properties`);
+
+	console.log("Seeding service catalog...");
+	await ServiceType.insertMany(serviceTypesSeed);
+	console.log(`  Created ${serviceTypesSeed.length} service types`);
 
 	console.log("");
 	console.log("=".repeat(40));
