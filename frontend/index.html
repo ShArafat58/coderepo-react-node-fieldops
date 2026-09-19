@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <script>document.documentElement.dataset.theme = localStorage.getItem("fieldops-theme") === "light" ? "light" : "dark";</script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#131314" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f8fafd" media="(prefers-color-scheme: light)" />
+    <title>FieldOps</title>
+    <style>
+        html,
+        body,
+        #root {
+            width: 100%;
+            min-width: 320px;
+            min-height: 100%;
+            margin: 0;
+        }
+
+        body {
+            background: #131314;
+        }
+
+        html[data-theme="light"] body,
+        html[data-theme="light"] .initial-fieldops-boot {
+            background: #f8fafd;
+        }
+
+        html[data-theme="light"] .initial-fieldops-boot {
+            color: #3c4043;
+        }
+
+        .initial-fieldops-boot {
+            display: grid;
+            position: fixed;
+            inset: 0;
+            place-content: center;
+            gap: 24px;
+            background: #131314;
+            color: #e3e3e3;
+            font-family: Arial, sans-serif;
+        }
+
+        .initial-fieldops-brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            font-size: 25px;
+        }
+
+        .initial-fieldops-mark {
+            display: grid;
+            position: relative;
+            width: 44px;
+            height: 44px;
+            overflow: hidden;
+            place-items: center;
+            border-radius: 5px;
+            background: linear-gradient(135deg, #1a73e8 0 72%, #174ea6 72%);
+            color: #fff;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .initial-fieldops-progress {
+            width: 154px;
+            height: 3px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 2px;
+            background: #394457;
+        }
+
+        .initial-fieldops-progress::after {
+            display: block;
+            width: 42%;
+            height: 100%;
+            border-radius: inherit;
+            background: #8ab4f8;
+            content: "";
+            animation: initial-progress 900ms ease-in-out infinite;
+        }
+
+        @keyframes initial-progress {
+            0% {
+                transform: translateX(-110%) scaleX(.75);
+            }
+
+            50% {
+                transform: translateX(95%) scaleX(1.15);
+            }
+
+            100% {
+                transform: translateX(310%) scaleX(.7);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .initial-fieldops-progress::after {
+                animation: none;
+                transform: translateX(70%);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <main class="initial-fieldops-boot" aria-hidden="true">
+            <div class="initial-fieldops-brand"><span class="initial-fieldops-mark">F</span><span>FieldOps</span></div>
+            <div class="initial-fieldops-progress"></div>
+        </main>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>

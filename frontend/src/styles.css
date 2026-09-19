@@ -1,0 +1,336 @@
+:root {
+    color-scheme: dark;
+    --surface: #1e1f20;
+    --surface-muted: #131314;
+    --hover: #2d2e31;
+    --field: #303134;
+    --field-active: #3c4043;
+    --divider: #2d2e31;
+    --border: #444746;
+    --border-strong: #5f6368;
+    --outline: #8e918f;
+    --scrollbar: #5f6368;
+    --grid: #3c4043;
+    --soft-grid: #2a2b2e;
+    --ink: #e3e3e3;
+    --ink-strong: #e8eaed;
+    --muted: #9aa0a6;
+    --quiet: #8e918f;
+    --faint: #6f7377;
+    --blue: #8ab4f8;
+    --blue-hover: #aecbfa;
+    --blue-tint: #394457;
+    --accent: #a8c7fa;
+    --accent-on: #062e6f;
+    --accent-ink: #d3e3fd;
+    --accent-tint: #1f3760;
+    --accent-wash: #232c3b;
+    --accent-container: #004a77;
+    --accent-container-ink: #c2e7ff;
+    --accent-container-hover: #005b8f;
+    --danger: #f2b8b5;
+    --danger-ink: #f9dedc;
+    --danger-container: #3b1f1c;
+    --danger-outline: #8c1d18;
+    --success: #6dd58c;
+    --success-container: #1e3b28;
+    --warning: #fdd663;
+    --warning-ink: #fdd663;
+    --warning-container: #3a2f00;
+    --warning-outline: #7a6000;
+    --info: #7fcfff;
+    --inverse-surface: #e3e3e3;
+    --inverse-ink: #1f1f1f;
+    --on-blue: #062e6f;
+    color: var(--ink);
+    background: var(--surface);
+    font-family: Roboto, Arial, sans-serif;
+    font-synthesis: none;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+    --surface: #fff;
+    --surface-muted: #f8fafd;
+    --hover: #f1f3f4;
+    --field: #e9eef6;
+    --field-active: #d9dfe7;
+    --divider: #eef0f2;
+    --border: #dadce0;
+    --border-strong: #e8eaed;
+    --outline: #747775;
+    --scrollbar: #bdc1c6;
+    --grid: #dadce0;
+    --soft-grid: #f1f3f4;
+    --ink: #202124;
+    --ink-strong: #3c4043;
+    --muted: #5f6368;
+    --quiet: #70757a;
+    --faint: #9aa0a6;
+    --blue: #1a73e8;
+    --blue-hover: #185abc;
+    --blue-tint: #d3e3fd;
+    --accent: #0b57d0;
+    --accent-on: #fff;
+    --accent-ink: #174ea6;
+    --accent-tint: #e8f0fe;
+    --accent-wash: #f6fafe;
+    --accent-container: #c2e7ff;
+    --accent-container-ink: #004a77;
+    --accent-container-hover: #b3ddf8;
+    --danger: #b3261e;
+    --danger-ink: #8c1d18;
+    --danger-container: #fce8e6;
+    --danger-outline: #f2b8b5;
+    --success: #137333;
+    --success-container: #e6f4ea;
+    --warning: #b06000;
+    --warning-ink: #5f4b00;
+    --warning-container: #fef7e0;
+    --warning-outline: #f6d58a;
+    --info: #039be5;
+    --inverse-surface: #323232;
+    --inverse-ink: #fff;
+    --on-blue: #fff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    width: 100%;
+    min-width: 320px;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+    background: var(--surface);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+    color: inherit;
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+    white-space: nowrap;
+}
+
+.app-boot {
+    display: grid;
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    place-content: center;
+    gap: 24px;
+    background: var(--surface-muted);
+    color: var(--ink-strong);
+}
+
+.app-boot-brand {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    font-size: 25px;
+    letter-spacing: -.35px;
+    animation: app-boot-enter 180ms ease-out both;
+}
+
+.app-boot-brand .brand-mark {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #1a73e8 0 72%, #174ea6 72%);
+    color: #fff;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.app-boot-brand strong {
+    font-weight: 400;
+}
+
+.app-boot-progress {
+    width: 154px;
+    height: 3px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--blue-tint);
+}
+
+.app-boot-progress span {
+    display: block;
+    width: 42%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--blue);
+    animation: app-boot-progress 900ms ease-in-out infinite;
+    transform-origin: left;
+}
+
+@keyframes app-boot-enter {
+    from {
+        transform: translateY(4px);
+    }
+}
+
+@keyframes app-boot-progress {
+    0% {
+        transform: translateX(-110%) scaleX(.75);
+    }
+
+    50% {
+        transform: translateX(95%) scaleX(1.15);
+    }
+
+    100% {
+        transform: translateX(310%) scaleX(.7);
+    }
+}
+
+.material-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    user-select: none;
+}
+
+.select-menu {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
+.select-menu>button[role="combobox"] {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 11px 0 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink-strong);
+    text-align: left;
+}
+
+.select-menu>button[role="combobox"]>span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.select-menu>button[role="combobox"]:hover,
+.select-menu>button[role="combobox"][aria-expanded="true"] {
+    border-color: var(--faint);
+    background: var(--surface-muted);
+}
+
+.select-menu>button[role="combobox"]:focus-visible {
+    border-color: var(--accent);
+    outline: 2px solid var(--blue-tint);
+    outline-offset: 1px;
+}
+
+.select-menu-arrow {
+    color: var(--muted);
+}
+
+.select-menu-options {
+    position: absolute;
+    z-index: 190;
+    top: calc(100% + 5px);
+    right: 0;
+    left: 0;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 6px 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: 0 5px 14px rgb(60 64 67 / 24%);
+    scrollbar-width: thin;
+    animation: menu-in 100ms ease-out;
+}
+
+.select-menu-options>button {
+    display: flex;
+    width: 100%;
+    min-height: 42px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 13px;
+    border: 0;
+    background: var(--surface);
+    color: var(--ink-strong);
+    font-size: 14px;
+    text-align: left;
+}
+
+.select-menu-options>button:hover,
+.select-menu-options>button:focus-visible {
+    background: var(--hover);
+    outline: 0;
+}
+
+.select-menu-options>button[aria-selected="true"] {
+    background: var(--accent-tint);
+    color: var(--accent-ink);
+}
+
+.icon-button {
+    display: inline-grid;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+}
+
+.icon-button:hover {
+    background: var(--hover);
+}
