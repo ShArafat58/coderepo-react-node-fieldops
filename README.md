@@ -149,3 +149,43 @@ The interface adapts automatically to role — admins get the full operations su
 *Built for the HackerRank "Build Your Own Full-Stack Application" assignment — mirroring the structure and conventions of the reference `coderepo-react-node-calendar` repository.*
 
 </div>
+
+---
+
+## 📸 Screenshots
+
+**Login**
+
+![Login screen](frontend/public/screenshots/login.png)
+
+**Admin Dashboard**
+
+![Operations dashboard with charts](frontend/public/screenshots/dashboard.png)
+
+**Job List with Status Filtering**
+
+![Jobs list](frontend/public/screenshots/jobs-list.png)
+
+**Technician Assignment**
+
+![Assign technician modal](frontend/public/screenshots/job-assign.png)
+
+**Job Audit Trail**
+
+![Job history timeline](frontend/public/screenshots/job-history.png)
+
+**Customer Management**
+
+![Customers list](frontend/public/screenshots/customers.png)
+
+**Technician Management**
+
+![Technicians list](frontend/public/screenshots/technicians.png)
+
+**Service Catalog**
+
+![Service catalog](frontend/public/screenshots/services.png)
+
+**Mobile Navigation**
+
+![Mobile navigation drawer](frontend/public/screenshots/mobile-nav.png)
